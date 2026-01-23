@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "46980072358",
+    "project_id": "fir-contacts-management",
+    "storage_bucket": "fir-contacts-management.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:46980072358:android:e66c2ddbf53b7538e60567",
+        "android_client_info": {
+          "package_name": "com.example.firebase_contacts_management"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCb8Y7ojbFWReWF1gmcQ6AqcshrYDDI6ZM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
