@@ -14,7 +14,8 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
-    final email = user?.email ?? 'User';
+    final email = user?.email ?? '';
+    final displayName = user?.displayName ?? '';
     final photoUrl = user?.photoURL;
 
     return Scaffold(
@@ -28,45 +29,86 @@ class HomeScreen extends StatelessWidget {
           ),
         ],
       ),
+      drawer: Drawer(
+        child: Column(
+          children: [
+            UserAccountsDrawerHeader(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primaryContainer,
+              ),
+              currentAccountPicture: photoUrl != null
+                  ? CircleAvatar(
+                      backgroundImage: NetworkImage(photoUrl),
+                      backgroundColor: Colors.transparent,
+                    )
+                  : CircleAvatar(
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      child: Icon(
+                        Icons.person,
+                        size: 48,
+                        color: Theme.of(context).colorScheme.onPrimary,
+                      ),
+                    ),
+              accountName: Text(
+                displayName.isNotEmpty ? displayName : 'Google account',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onPrimaryContainer,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+              accountEmail: Text(
+                email.isNotEmpty ? email : 'Not signed in',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onPrimaryContainer.withOpacity(0.9),
+                  fontSize: 14,
+                ),
+              ),
+            ),
+            const Divider(height: 1),
+            ListTile(
+              leading: const Icon(Icons.mail_outline),
+              title: const Text('Email'),
+              subtitle: email.isNotEmpty ? Text(email) : null,
+            ),
+            if (displayName.isNotEmpty)
+              ListTile(
+                leading: const Icon(Icons.badge_outlined),
+                title: const Text('Name'),
+                subtitle: Text(displayName),
+              ),
+            const Spacer(),
+            const Divider(height: 1),
+            ListTile(
+              leading: const Icon(Icons.logout),
+              title: const Text('Sign out'),
+              onTap: _signOut,
+            ),
+          ],
+        ),
+      ),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              if (photoUrl != null)
-                CircleAvatar(
-                  radius: 48,
-                  backgroundImage: NetworkImage(photoUrl),
-                )
-              else
-                CircleAvatar(
-                  radius: 48,
-                  backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-                  child: Icon(
-                    Icons.person,
-                    size: 48,
-                    color: Theme.of(context).colorScheme.onPrimaryContainer,
-                  ),
-                ),
+              Icon(
+                Icons.contacts_rounded,
+                size: 80,
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
+              ),
               const SizedBox(height: 24),
               Text(
-                'Welcome',
+                'Contacts',
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
               const SizedBox(height: 8),
               Text(
-                email,
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                'Open the menu for your account',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 32),
-              FilledButton.icon(
-                onPressed: _signOut,
-                icon: const Icon(Icons.logout),
-                label: const Text('Sign out'),
               ),
             ],
           ),
