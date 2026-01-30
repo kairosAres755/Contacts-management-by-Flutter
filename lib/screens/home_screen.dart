@@ -51,8 +51,14 @@ class HomeScreen extends StatelessWidget {
     final ok = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
         title: const Text('Delete contact?'),
-        content: Text('Remove "${contact.name}" from your contacts?'),
+        content: Text(
+          'Remove "${contact.name}" from your contacts?',
+          style: Theme.of(context).textTheme.bodyLarge,
+        ),
+        contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+        actionsPadding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
@@ -62,6 +68,7 @@ class HomeScreen extends StatelessWidget {
             onPressed: () => Navigator.of(context).pop(true),
             style: FilledButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.error,
+              foregroundColor: Theme.of(context).colorScheme.onError,
             ),
             child: const Text('Delete'),
           ),
@@ -71,6 +78,15 @@ class HomeScreen extends StatelessWidget {
     if (ok == true) {
       await _contactsRef(uid).doc(contact.id).delete();
     }
+  }
+
+  /// First grapheme for avatar (handles CJK, emoji, multi-byte).
+  static String _avatarInitial(String name) {
+    final t = name.trim();
+    if (t.isEmpty) return '?';
+    final runes = t.runes;
+    if (runes.isEmpty) return '?';
+    return String.fromCharCodes([runes.first]).toUpperCase();
   }
 
   @override
