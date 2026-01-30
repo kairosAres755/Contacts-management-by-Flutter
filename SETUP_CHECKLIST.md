@@ -1,6 +1,6 @@
-# Google Sign-In Setup (Firebase only, no OAuth 2.0)
+# Google Sign-In Setup
 
-This app uses **Firebase Authentication** with **Google Sign-In**. All setup is in the Firebase Console — no OAuth 2.0 Client IDs or Web Client ID in code.
+This app uses **Firebase Authentication** with **Google Sign-In**. If Android sign-in fails, set the Web Client ID in `lib/auth_config.dart` (see step 4).
 
 ---
 
@@ -36,7 +36,16 @@ After adding SHA-1, Firebase may offer to **download the new config**:
 2. Replace `android/app/google-services.json` with it  
    (this refreshes the config Firebase uses for Google Sign-In).
 
-### 4. Rebuild the app
+### 4. (If still failing) Set Web Client ID
+
+1. Open [Google Cloud Console → Credentials](https://console.cloud.google.com/apis/credentials?project=fir-contacts-management)
+2. Under **OAuth 2.0 Client IDs**, open **"Web client (auto created by Google Service)"**
+3. Copy the **Client ID** (e.g. `46980072358-xxxxx.apps.googleusercontent.com`)
+4. In the project, open **`lib/auth_config.dart`**
+5. Set: `const String kGoogleWebClientId = 'YOUR_CLIENT_ID';`
+6. Save and rebuild.
+
+### 5. Rebuild the app
 
 ```bash
 flutter clean
@@ -50,6 +59,7 @@ flutter run
 - [ ] Google Sign-In **enabled** in Firebase → Authentication → Sign-in method  
 - [ ] **SHA-1** added in Firebase → Project settings → Android app  
 - [ ] **google-services.json** from Firebase (after SHA-1) is in `android/app/`  
+- [ ] If sign-in still fails: **Web Client ID** set in `lib/auth_config.dart`  
 - [ ] `flutter clean && flutter run` done after any config change  
 
 ---

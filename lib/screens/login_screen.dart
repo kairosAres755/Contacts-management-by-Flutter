@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-/// Google Sign-In with Firebase Authentication only.
-/// No OAuth 2.0 / Web Client ID in code — configure in Firebase Console (enable Google, add SHA-1, use google-services.json).
+import '../auth_config.dart';
+
+/// Google Sign-In with Firebase Authentication.
+/// Set kGoogleWebClientId in auth_config.dart if Android sign-in fails (ApiException: 10).
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -47,7 +50,9 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     try {
-      final googleSignIn = GoogleSignIn();
+      final googleSignIn = GoogleSignIn(
+        serverClientId: kGoogleWebClientId.isEmpty ? null : kGoogleWebClientId,
+      );
       final googleUser = await googleSignIn.signIn();
       if (googleUser == null) {
         setState(() => _isLoading = false);
@@ -60,6 +65,17 @@ class _LoginScreenState extends State<LoginScreen> {
         idToken: googleAuth.idToken,
       );
       await FirebaseAuth.instance.signInWithCredential(credential);
+      if (!mounted) return;
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+          'uid': user.uid,
+          'email': user.email ?? '',
+          'displayName': user.displayName ?? '',
+          'photoURL': user.photoURL ?? '',
+          'updatedAt': FieldValue.serverTimestamp(),
+        }, SetOptions(merge: true));
+      }
       if (!mounted) return;
       setState(() => _isLoading = false);
     } on FirebaseAuthException catch (e) {
@@ -77,10 +93,10 @@ class _LoginScreenState extends State<LoginScreen> {
             errorString.contains('sign_in_failed') ||
             errorString.contains('PlatformException')) {
           _errorTitle = 'Setup required';
-          _errorMessage = 'Fix: 1) Enable Google in Firebase (Authentication > Sign-in method). '
+          _errorMessage = '1) Enable Google in Firebase (Authentication > Sign-in method). '
               '2) Add SHA-1 in Firebase (Project Settings > Android app > Add fingerprint). '
-              '3) Re-download google-services.json from Firebase and replace android/app/google-services.json. '
-              '4) Run: flutter clean && flutter run';
+              '3) Set Web Client ID in lib/auth_config.dart (from Google Cloud Console > Credentials > OAuth 2.0 > Web client). '
+              '4) Re-download google-services.json, then: flutter clean && flutter run';
         } else {
           _errorTitle = 'Error';
           _errorMessage = e.toString().length > 200
