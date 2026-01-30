@@ -109,41 +109,56 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
     return Scaffold(
       body: SafeArea(
         child: Center(
-          child: Padding(
+          child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 32),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  Icons.contacts_rounded,
-                  size: 80,
-                  color: Theme.of(context).colorScheme.primary,
+                Container(
+                  width: 96,
+                  height: 96,
+                  decoration: BoxDecoration(
+                    color: colorScheme.primaryContainer.withOpacity(0.5),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.contacts_rounded,
+                    size: 48,
+                    color: colorScheme.primary,
+                  ),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 32),
                 Text(
                   'Contacts',
-                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                  style: textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: -0.5,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 10),
                 Text(
                   'Sign in with your Google account to continue',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
+                  style: textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                    height: 1.4,
+                  ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 48),
                 if (_errorMessage != null) ...[
                   Container(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.errorContainer,
-                      borderRadius: BorderRadius.circular(8),
+                      color: colorScheme.errorContainer,
+                      borderRadius: BorderRadius.circular(12),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -151,18 +166,17 @@ class _LoginScreenState extends State<LoginScreen> {
                         Row(
                           children: [
                             Icon(
-                              Icons.error_outline,
-                              color: Theme.of(context).colorScheme.onErrorContainer,
+                              Icons.error_outline_rounded,
+                              color: colorScheme.onErrorContainer,
                               size: 24,
                             ),
-                            const SizedBox(width: 8),
+                            const SizedBox(width: 12),
                             Expanded(
                               child: Text(
                                 _errorTitle,
-                                style: TextStyle(
-                                  color: Theme.of(context).colorScheme.onErrorContainer,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
+                                style: textTheme.titleSmall?.copyWith(
+                                  color: colorScheme.onErrorContainer,
+                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
                             ),
@@ -171,20 +185,20 @@ class _LoginScreenState extends State<LoginScreen> {
                         const SizedBox(height: 12),
                         Text(
                           _errorMessage!,
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onErrorContainer,
-                            fontSize: 13,
+                          style: textTheme.bodySmall?.copyWith(
+                            color: colorScheme.onErrorContainer,
                             height: 1.4,
+                            fontSize: 13,
                           ),
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 28),
                 ],
                 SizedBox(
                   width: double.infinity,
-                  height: 52,
+                  height: 56,
                   child: FilledButton.icon(
                     onPressed: _isLoading ? null : _signInWithGoogle,
                     icon: _isLoading
@@ -193,15 +207,19 @@ class _LoginScreenState extends State<LoginScreen> {
                             height: 24,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              color: Theme.of(context).colorScheme.onPrimary,
+                              color: colorScheme.onPrimary,
                             ),
                           )
-                        : const Icon(Icons.g_mobiledata, size: 28),
+                        : const Icon(Icons.g_mobiledata_rounded, size: 28),
                     label: Text(_isLoading ? 'Signing in…' : 'Continue with Google'),
                     style: FilledButton.styleFrom(
                       backgroundColor: Colors.white,
                       foregroundColor: Colors.black87,
-                      side: BorderSide(color: Colors.grey.shade300),
+                      side: BorderSide(color: Colors.grey.shade300, width: 1),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
                     ),
                   ),
                 ),
