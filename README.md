@@ -29,7 +29,13 @@ A Flutter app with **Google Sign-In via Firebase Authentication** — no OAuth 2
 3. Paste SHA-1 → **Save**
 4. If Firebase offers it, **download the new `google-services.json`** and replace `android/app/google-services.json`.
 
-### Step 3: Run the app
+### Step 3: Enable Firestore (for contacts)
+
+1. Firebase Console → **Build** → **Firestore Database** → **Create database**
+2. Choose **Start in test mode** (or use rules that allow read/write for authenticated users).
+3. Pick a location and **Enable**.
+
+### Step 4: Run the app
 
 ```bash
 flutter pub get
@@ -44,6 +50,47 @@ flutter run
 - Then: `flutter clean && flutter run`
 
 See [SETUP_CHECKLIST.md](SETUP_CHECKLIST.md) for the full checklist.
+
+## How contacts are saved in Firebase (Firestore)
+
+Contacts are stored in **Cloud Firestore** so each signed-in user has their own list.
+
+### Firestore layout
+
+```
+users
+  └── {userId}          ← Firebase Auth UID (from currentUser.uid)
+        └── contacts    ← subcollection
+              └── {contactId}   ← auto-generated doc ID
+                    ├── name      (string)
+                    ├── phone     (string)
+                    ├── email     (string)
+                    └── createdAt (timestamp)
+```
+
+### What the app does
+
+| Action  | Firestore call | Where in code |
+|---------|----------------|---------------|
+| **Add** | `users/{uid}/contacts.add(data)` | `home_screen.dart` → `_addContact()` → `_contactsRef(uid).add(contact.toMap())` |
+| **Edit**| `users/{uid}/contacts/{id}.update(fields)` | `_editContact()` → `_contactsRef(uid).doc(contact.id).update({...})` |
+| **Delete** | `users/{uid}/contacts/{id}.delete()` | `_deleteContact()` → `_contactsRef(uid).doc(contact.id).delete()` |
+| **List** | `users/{uid}/contacts.orderBy('createdAt').snapshots()` | `StreamBuilder` in `home_screen.dart` body |
+
+### Turning a contact into Firestore data
+
+`Contact.toMap()` in `lib/models/contact.dart` returns a map Firestore accepts:
+
+- `name`, `phone`, `email` — strings  
+- `createdAt` — `FieldValue.serverTimestamp()` for new contacts, or `Timestamp.fromDate(...)` when updating
+
+So “saving in Firebase” here means:
+
+1. **New contact:** call `_contactsRef(uid).add(contact.toMap())` (e.g. from the FAB → Add contact → Save).
+2. **Edit contact:** call `_contactsRef(uid).doc(contact.id).update({ 'name': ..., 'phone': ..., 'email': ... })`.
+3. **Delete contact:** call `_contactsRef(uid).doc(contact.id).delete()`.
+
+Firestore must be enabled in the Firebase Console (see Step 3 above); the app uses the default project and does not need extra config to save.
 
 ## Getting Started
 
