@@ -1,5 +1,6 @@
 # Firebase Contacts Management
 
+
 A Flutter app with **Google Sign-In via Firebase Authentication** — no OAuth 2.0 or Web Client ID in code; setup is done only in the Firebase Console.
 
 > ⚠️ **Getting Error Code 10?** See [SETUP_CHECKLIST.md](SETUP_CHECKLIST.md).
